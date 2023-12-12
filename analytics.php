@@ -10,66 +10,65 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="assets/css/homecss.css">
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script type="text/javascript">
       google.charts.load('current', {'packages':['corechart']});
       google.charts.setOnLoadCallback(drawChart);
       google.charts.setOnLoadCallback(drawChart2);
-      google.charts.setOnLoadCallback(drawChart3);
 
       function drawChart() {
-        // kunin nalang yung value sa database
-        // example category sa campus, kung ilang report cases 
-        var data = google.visualization.arrayToDataTable([
-          ['Campus', 'Cases'],
-          ['Asingan', 11], // yung mga number dito, kukunin sa database
-          ['Bayambang', 2],
-          ['Binmaley', 2],
-          ['Infanta', 2],
-          ['Lingayen', 7],
-          ['San Carlos', 5],
-          ['Sta. Maria', 5],
-          ['Urdaneta', 30]
-        ]);
+            // Fetch data from the server using AJAX
+        var jsonData = $.ajax({
+            url: "get-campus-data.php",
+            dataType: "json",
+            async: false
+        }).responseText;
+
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', 'Campus');
+        data.addColumn('number', 'Cases');
+        
+        // Parse JSON data and add to DataTable
+        jsonData = JSON.parse(jsonData);
+        data.addRows(jsonData);
 
         var options = {
-          title: 'Campus Report Cases',
-          width: '100%', // Set the width to 100%
-          height: 300,   // Set the height as needed
-          chartArea: {
-            width: '80%',  // Set the chart area width to 80%
-          },
+            title: 'Campus Report Cases',
+            width: '100%',
+            height: 300,
+            chartArea: {
+                width: '80%',
+            },
         };
 
         var chart = new google.visualization.PieChart(document.getElementById('piechart'));
-
         chart.draw(data, options);
       }
 
       function drawChart2() {
-        var data = google.visualization.arrayToDataTable([
-          ['Violations', 'Cases'],
-          ['Physical Violence', 15], // yung mga number dito, kukunin sa database
-          ['Sexual Violence', 4],
-          ['Emotional Violence', 6],
-          ['Psychological Violence', 7],
-          ['Spiritual Violence', 7],
-          ['Cultural Violence', 8],
-          ['Verbal Abuse', 5],
-          ['Financial Abuse', 10],
-        ]);
+            var jsonData = $.ajax({
+            url: "get-violence-data.php", // Create a new PHP file to handle violence data
+            dataType: "json",
+            async: false
+        }).responseText;
 
-        
+        jsonData = JSON.parse(jsonData);
+
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', 'Violence Type');
+        data.addColumn('number', 'Cases');
+        data.addRows(jsonData);
+
         var options = {
-            title: 'Types of Violence and Abuse',
-            width: '100%', // Set the width to 100%
-            height: 300,   // Set the height as needed
+            title: 'Violence and Abuse Reports',
+            width: '100%',
+            height: 300,
             chartArea: {
-                width: '80%',  // Set the chart area width to 80%
+                width: '80%',
             },
         };
 
         var chart = new google.visualization.PieChart(document.getElementById('piechart2'));
-
         chart.draw(data, options);
       }
     </script>

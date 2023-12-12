@@ -1,3 +1,7 @@
+<?php
+ require("config.php");
+ session_start();
+?>
   <!DOCTYPE html>
   <html lang="en">
   <head>
@@ -57,7 +61,7 @@
         <li>
           <a href="#">
             <i class='bx bx-user' ></i>
-            <span class="link_name">Hello, <?php session_start(); echo $_SESSION['username'] . "!"; ?></span>
+            <span class="link_name">Hello, <?php echo $_SESSION['username'] . "!"; ?></span>
           </a>
           <span class="tooltip"><?php echo $_SESSION['username']; ?></span>
         </li> 
@@ -86,46 +90,93 @@
       </ul>
     </div>
     <section class="home-section">
-      <div class="container">
+    <div class="container">
         <h1 class="text fs-1 fw-bold pt-4">REPORTS</h1>
-        
         <div class="row">
-          <div class="col-md-7">
-            <div class="card">
-              <div class="row">
-                <div class="col-md-6">
-                  <img src="https://images.pexels.com/photos/16143559/pexels-photo-16143559/free-photo-of-landscape-of-rocky-snowcapped-mountains.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" class="card-img" alt="" />
-                </div>
-                <div class="col-md-6">
-                  <div class="card-body">
-                    <h5 class="card-title">Username <small class="text-muted">Datetime of report</small></h5>
-                    <p class="card-text">Report description</p>
-                    <button class="comment">
-                      <i class='bx bx-comment-detail'></i>
-                      <a href="#">Add A Comment</a>
-                    </button>
-                    
-                  </div>
-                </div>
-              </div>
+            <div class='col-md-7'>
+
+
+              <!-- display yung mga reports from the database -->
+                <?php
+                
+                $sql = "SELECT * FROM reports INNER JOIN user ON user.email = reports.email";
+                $result = $connect->query($sql);
+
+                if ($result->num_rows > 0) {
+                    while ($row = $result->fetch_assoc()) {
+                        echo "<div class='card mb-3'>";
+                        echo "<div class='row g-0'>";
+                        echo "<div class='col-md-4'>";
+                        echo "<img src='" . $row["picture_path"] . "' alt='Report Image' class='img-fluid rounded-start'>";
+                        echo "</div>";
+                        echo "<div class='col-md-8'>";
+                        echo "<div class='card-body'>";
+                        echo "<h5 class='card-title'>".$row['username']." <small class='text-muted'>" . $row['dateReported'] . "</small></h5>";
+                        echo "<p class='card-text'>" . $row['description'] . "</p>";
+                        echo "<button class='comment'>";
+                        echo "<i class='bx bx-comment-detail'></i>";
+                        echo "<a href='#'>Add A Comment</a>";
+                        echo "</button>";
+                        echo "</div>";
+                        echo "</div>";
+                        echo "</div>";
+                        echo "</div>";
+                    }
+                } else {
+                    echo "<p>No reports available.</p>";
+                }
+                ?>
             </div>
-          </div>
-          <div class="col-md-5 sticky-column d-md-block d-none">
-            <div class="card">
-              <h2>My Reports</h2>
-              
-              lalabas yung mga reports niya dito kung meron man, parang sa blog, kumbaga makikita niya lang yung mga pinost niya
+
+            <div class="col-md-5 sticky-column d-md-block d-none">
+                <div class="card">
+                    <ul>
+                        <h2>My Reports</h2>
+                        <?php
+                        $email = $_SESSION['email'];
+                
+                        $sql = "SELECT * FROM reports WHERE email = '$email'";
+
+                $result = $connect->query($sql);
+
+                if ($result->num_rows > 0) {
+                    while ($row = $result->fetch_assoc()) {
+                        echo "<div class='card mb-3'>";
+                        echo "<div class='row g-0'>";
+                        echo "<div class='col-md-4'>";
+                        echo "<img src='" . $row["picture_path"] . "' alt='Report Image' class='img-fluid rounded-start'>";
+                        echo "</div>";
+                        echo "<div class='col-md-8'>";
+                        echo "<div class='card-body'>";
+                        echo "<h5 class='card-title'>".$row['email']." <small class='text-muted'>" . $row['dateReported'] . "</small></h5>";
+                        echo "<p class='card-text'>" . $row['description'] . "</p>";
+                        echo "<button class='comment'>";
+                        echo "<i class='bx bx-comment-detail'></i>";
+                        echo "<a href='#'>Add A Comment</a>";
+                        echo "</button>";
+                        echo "</div>";
+                        echo "</div>";
+                        echo "</div>";
+                        echo "</div>";
+                    }
+                } else {
+                    echo "<p>No reports available.</p>";
+                }
+                $connect->close();
+                ?>
+                    </ul>
+                </div>
             </div>
-          </div>
         </div>
-      </div>
-      <button class="btn-blue">
+    </div>
+    <button class="btn-blue">
           <a href="#">
               <i class='bx bx-edit-alt'></i>
               <span class="link_name">Report A Case</span>
           </a>
         </button>
-    </section>
+</section>
+
     
     <script>
           $(document).ready(function () {

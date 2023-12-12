@@ -1,8 +1,3 @@
-<!--
-coordinator sample account:
-email: c@gmail.com
-password: 123123
- -->
 <!DOCTYPE html>
 <html lang="en">
 <head>

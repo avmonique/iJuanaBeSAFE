@@ -21,6 +21,13 @@
           .home-section .comment i {
             color: #4F9EFA;
           }
+          @media (min-width: 990px) {
+            .card-text {
+              max-height: 150px; 
+              overflow-y: auto;
+            }
+            
+          }
     </style>
 </head>
 <body>

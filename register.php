@@ -1,18 +1,31 @@
 <?php
-    require("config.php");
-    session_start();
+require("config.php");
+session_start();
 
-    $errorMsg = "";
-    $successMsg = "";
+$errorMsg = "";
+$successMsg = "";
 
-    if (isset($_POST['register'])) {
-        $firstname = clean_data($_POST['firstname']);
-        $lastname = clean_data($_POST['lastname']);
-        $campus = clean_data($_POST['campus']);
-        $email = clean_data($_POST['email']);
-        $username = clean_data($_POST['username']);
-        $password = clean_data(md5($_POST['password']));
+if (isset($_POST['register'])) {
+    $firstname = clean_data($_POST['firstname']);
+    $lastname = clean_data($_POST['lastname']);
+    $campus = clean_data($_POST['campus']);
+    $email = clean_data($_POST['email']);
+    $username = clean_data($_POST['username']);
+    $password = clean_data(md5($_POST['password']));
 
+    // Regex patterns
+    // $emailPattern = '/^[a-z]{8}\d{2}UR\d{4}@psu\.edu\.ph$/';
+    $emailPattern = '/^[a-z_]+\d{2}ur\d{4}@psu\.edu\.ph$/i';
+    $passwordPattern = '/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/';
+
+    // Validate email
+    if (!preg_match($emailPattern, $email)) {
+        $errorMsg = "Invalid email address.";
+    }
+    // Validate password
+    elseif (!preg_match($passwordPattern, $_POST['password'])) {
+        $errorMsg = "Password must be at least 8 characters long and contain at least one letter and one number.";
+    } else {
         $checkUsernameQuery = $connect->query("SELECT * FROM user WHERE email='$email' ");
         if ($checkUsernameQuery->num_rows > 0) {
             $errorMsg = "Email already registered.";
@@ -28,16 +41,18 @@
             }
         }
     }
-    function clean_data($input)
-    {
-        $input = htmlspecialchars($input);
-        $input = trim($input);
-        $input = stripslashes($input);
-        return $input;
-    }
+}
+function clean_data($input)
+{
+    $input = htmlspecialchars($input);
+    $input = trim($input);
+    $input = stripslashes($input);
+    return $input;
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -48,6 +63,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="assets/css/styles.css">
 </head>
+
 <body style="background: #F3F2F7;">
     <div class="container d-flex justify-content-center align-items-center min-vh-100">
         <div class="row border rounded-5 p-3 bg-white shadow box-area">
@@ -57,18 +73,18 @@
                     <img src="assets/images/login-sup.png" class="img-fluid" style="width: 250px;">
                 </div>
                 <small class="text-white text-wrap text-center fs-5">Cloud-Based Gender-Based Violence Reporting and Analytics System for Pangasinan State University</small>
-            </div> 
+            </div>
             <div class="col-md-6 right-box">
                 <div class="row align-items-center">
                     <div class="header-text text-center">
                         <h2 class="fw-bold fs-1" style="color: #4F9EFA">REGISTER</h2>
                     </div>
                     <?php
-                        if ($errorMsg !== "") {
-                            echo '<div class="alert alert-danger" role="alert">' . $errorMsg . '</div>';
-                        } elseif ($successMsg !== "") {
-                            echo '<div class="alert alert-success" role="alert">' . $successMsg . '</div>';
-                        }
+                    if ($errorMsg !== "") {
+                        echo '<div class="alert alert-danger" role="alert">' . $errorMsg . '</div>';
+                    } elseif ($successMsg !== "") {
+                        echo '<div class="alert alert-success" role="alert">' . $successMsg . '</div>';
+                    }
                     ?>
                     <form action="" method="post">
                         <label for="firstname">First Name:</label>
@@ -100,11 +116,11 @@
                         </div>
                         <label for="email">Email Address:</label>
                         <div class="input-group mb-2">
-                            <input name="email" type="text" class="form-control form-control-lg bg-light fs-6" required>
+                            <input name="email" type="text" class="form-control form-control-lg bg-light fs-6" placeholder="e.g. a-z{8}_xxURxxxx@psu.edu.ph" required>
                         </div>
                         <label for="username">Password:</label>
                         <div class="input-group mb-1">
-                            <input name="password" type="password" class="form-control form-control-lg bg-light fs-6" required>
+                            <input name="password" type="password" class="form-control form-control-lg bg-light fs-6" placeholder="e.g. Abcd1234" required>
                         </div>
                         <div class="input-group my-2">
                             <button name="register" class="btn w-100 fs-6" style="background-color: #4F9EFA; color: white">REGISTER</button>
@@ -114,8 +130,9 @@
                         <small>Already have an account? <a href="login.php">Login Here.</a></small>
                     </div>
                 </div>
-            </div> 
+            </div>
         </div>
     </div>
 </body>
+
 </html>

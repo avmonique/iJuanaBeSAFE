@@ -12,6 +12,8 @@ if (isset($_POST["violenceType"])) {
     $description = $_POST['description'];
     $errorMessage = "";
 
+
+
     $targetDirectory = "images/";
 
     if (!empty($_FILES["picture_path"]["name"])) {
@@ -48,8 +50,7 @@ if (isset($_POST["violenceType"])) {
             $errorMessage = "Error creating record: " . mysqli_error($connect);
         }
     }
-
-    // If execution reaches here, there was an error
+    
     $response['success'] = false;
     $response['message'] = $errorMessage;
     echo json_encode($response);

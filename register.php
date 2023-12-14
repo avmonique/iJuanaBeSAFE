@@ -114,9 +114,9 @@ function clean_data($input)
                         <div class="input-group mb-1">
                             <input name="username" type="text" class="form-control form-control-lg bg-light fs-6" required>
                         </div>
-                        <label for="email">Email Address:</label>
+                        <label for="email">Institutional Email:</label>
                         <div class="input-group mb-2">
-                            <input name="email" type="text" class="form-control form-control-lg bg-light fs-6" placeholder="e.g. a-z{8}_xxURxxxx@psu.edu.ph" required>
+                            <input name="email" type="text" class="form-control form-control-lg bg-light fs-6" placeholder="e.g. a-z_xxURxxxx@psu.edu.ph" required>
                         </div>
                         <label for="username">Password:</label>
                         <div class="input-group mb-1">

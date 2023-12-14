@@ -1,3 +1,12 @@
+
+<?php
+ require("config.php");
+ session_start();
+ if(!isset($_SESSION['email']) || empty($_SESSION['email'])) {
+    header("Location: login.php");
+    exit();
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -23,10 +32,9 @@
           }
           @media (min-width: 990px) {
             .card-text {
-              max-height: 150px; 
-              overflow-y: auto;
+              max-height: 100px; 
+              overflow-y: hidden;
             }
-            
           }
     </style>
 </head>
@@ -45,13 +53,13 @@
         </a>
         <span class="tooltip">Reports</span>
       </li> 
-      <li>
+      <!-- <li>
         <a href="messages.php">
           <i class="bx bx-chat"></i>
           <span class="link_name">Messages</span>
         </a>
         <span class="tooltip">Messages</span>
-      </li>
+      </li> -->
       <li>
         <a href="analytics.php">
           <i class="bx bx-pie-chart-alt-2"></i>
@@ -72,41 +80,65 @@
     <div class="container">
       <h1 class="text fs-1 fw-bold pt-4">REPORTS</h1>
         <div class="row">
-          <div class="col-md-7">
-            <div class="card">
-              <div class="row">
-                <div class="col-md-6">
-                  <img src="https://images.pexels.com/photos/16143559/pexels-photo-16143559/free-photo-of-landscape-of-rocky-snowcapped-mountains.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" class="card-img" alt="" />
-                </div>
-                <div class="col-md-6">
-                  <div class="card-body">
-                    <h5 class="card-title">Username <small class="text-muted">Datetime of report</small></h5>
-                    <p class="card-text">Report description</p>
-                    <button class="comment">
-                      <i class='bx bx-comment-detail'></i>
-                      <a href="#">Add A Comment</a>
-                    </button>
-                    
-                  </div>
-                </div>
-              </div>
-            </div>
+          
+          <?php
+        // fetch-reports.php
+
+        require("config.php");
+
+        $sql = "SELECT * FROM reports INNER JOIN user ON user.email = reports.email ORDER BY dateReported DESC";
+        $result = $connect->query($sql);
+
+        function getInitials($name) {
+          $words = explode(" ", $name);
+          $initials = "";
+          foreach ($words as $w) {
+              $initials .= $w[0];
+          }
+          return $initials;
+      }
+
+      if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            echo "<div class='col-md-6'>";
+            echo "<div class='card mb-3'>";
+            echo "<div class='row g-0'>";
+            if (!empty($row["picture_path"])) {
+              echo "<div class='col-md-4'>";
+              echo "<img src='" . $row["picture_path"] . "' alt='Report Image' class='img-fluid rounded-start'>";
+              echo "</div>";
+              echo "<div class='col-md-8'>";
+          } else {
+              echo "<div class='col'>";
+          }
+            
+            echo "<div class='card-body accordion p-4'>";
+            echo "<div class='avatar rounded-circle text-center text-white' style='background: #4F9EFA; float: left; width: 35px; height: 35px; line-height: 35px; font-size: 14px;'>"; 
+            echo getInitials($row['firstname'] . " " . $row['lastname']);
+            echo "</div>";
+            echo "<h5 class='card-title ms-5 mt-1' style='margin-left: 10px;'>" . $row['username'] . " <small class='text-muted' style='font-size: 13px'>" . $row['dateReported'] . "</small></h5>";
+            echo "<p class='card-text p-1'>" . $row['description'] . "</p>";
+            // echo "<button class='comment'>";
+            // echo "<i class='bx bx-comment-detail'></i>";
+            // echo "<a href='#'> Add A Comment</a>";
+            // echo "</button>";
+            echo "</div>";
+            echo "</div>";
+    
+            echo "</div>";
+            echo "</div>";
+            echo "</div>";
+        }
+    } else {
+        echo "<p>No reports available.</p>";
+    }
+      
+
+        $connect->close();
+        ?>
+
           </div>
-        <div class="col-md-5 sticky-column d-md-block d-none">
-          <div class="card">
-            <ul>
-              <h4>Filter reports by:</h4>
-              <li><a href="">Physical Violence</a></li>
-              <li><a href="">Sexual Violence</a></li>
-              <li><a href="">Emotional Violence</a></li>
-              <li><a href="">Psychological Violence</a></li>
-              <li><a href="">Spiritual Violence</a></li>
-              <li><a href="">Cultural Violence</a></li>
-              <li><a href="">Verbal Abuse</a></li>
-              <li><a href="">Financial Abuse</a></li>
-            </ul>
-          </div>
-        </div>
+        
       </div>
     </div>
   </section>

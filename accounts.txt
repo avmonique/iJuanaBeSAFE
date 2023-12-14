@@ -1,0 +1,17 @@
+students registered:
+    email: judy_21ur0123@psu.edu.ph
+    password: Qwerty123
+
+    email: npascual_21ur0987@psu.edu.ph
+    password: Pass12345
+
+    email: mina_21ur0325@psu.edu.ph
+    password: Minari00
+
+
+coordinators acc:
+    email: c@psu.edu.ph
+    password: coor123
+    
+    email: c2@psu.edu.ph
+    password: Coor2000

@@ -49,7 +49,43 @@
     </ul>
   </div>
   <section class="home-section">
-    
+  <div class="container">
+  <?php
+$apiKey = 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtudosRn0qbNUGmZZcUuhoogK/Xeu6X11S1OQKL6TfvbdBKneGAWV79aswi4V9QEgQGp6ZN3X5XOBB0u8uNJ86S0M2cURx4GrZOS6YhZJTlmfrnWPoqpBFj7V84jszuVukPF7SUF9K3oErCv2JsIDqiq3yWSyjsi7vnY1xslcEs5qIE+vwFiY9af6bI/Xvm0ucgv7v3gw9prtcfAT/iCLqt5lC+T7lzIZBY71YbFWAFZ/M6/6EVtwsZPZFtNj39KuxGCKv47hL6qR93D9rMkZKKIK+HbOdl+qlC/wFocXwQXkZ3goUHhj+wgMUhdqlpwnwWAEWFf+v/K7BbJkj9+xEwIDAQAB'; // Replace with your actual API key
+
+// Data for sending a message
+$data = array(
+    'message' => 'Hello from SCYET!',
+    // Other necessary parameters as required by SCYET API
+);
+
+// Initialize cURL session
+$ch = curl_init('https://us-ohio-api.sceyt.com');
+
+// Set cURL options
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+    'Authorization: Bearer ' . $apiKey,
+    'Content-Type: application/json',
+));
+curl_setopt($ch, CURLOPT_POST, true);
+curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+
+// Execute cURL session and capture the response
+$response = curl_exec($ch);
+
+// Check for errors
+if ($response === false) {
+    echo 'cURL error: ' . curl_error($ch);
+} else {
+    echo 'Message sent successfully!';
+}
+
+// Close cURL session
+curl_close($ch);
+?>
+
+	</div>
   </section>
 
 

@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -33,10 +34,11 @@
                             $email = clean_data($_POST['email']);
                             $password = clean_data($_POST['password']);
 
-                            $checkCoordinatorQuery = $connect->query("SELECT * FROM user WHERE email='$email' AND password='$password'");
+                            $checkCoordinatorQuery = $connect->query("SELECT * FROM coordinators WHERE email='$email' AND password='$password'");
 
                             if ($checkCoordinatorQuery->num_rows == 1) {
                                 $row = $checkCoordinatorQuery->fetch_array();
+                                $_SESSION['email'] = $row['email'];
                                 header("Location: home.php");
                             } else {
                                 $hashed_password = md5($password);
@@ -46,6 +48,7 @@
                                     $row = $checkQuery->fetch_array();
                                     $_SESSION['username'] = $row['username'];
                                     $_SESSION['email'] = $row['email'];
+                                    $_SESSION['campus'] = $row['campus'];
                                     header("Location: home-student.php");
                                 } else {
                                     echo "<div class='alert alert-danger pb-0'><p>Wrong email or password.</p></div>";
@@ -62,7 +65,7 @@
                         }
                     ?>
                     <form action="" method="POST" >
-                        <label for="email">Email Address:</label>
+                        <label for="email">Institutional Email:</label>
                         <div class="input-group mb-2">
                             <input name="email" type="text" class="form-control form-control-lg bg-light fs-6" required>
                         </div>

@@ -1,6 +1,10 @@
 <?php
  require("config.php");
  session_start();
+ if(!isset($_SESSION['email']) || empty($_SESSION['email'])) {
+    header("Location: login.php");
+    exit();
+}
 ?>
   <!DOCTYPE html>
   <html lang="en">
@@ -48,6 +52,12 @@
           .home-section .comment i {
             color: #4F9EFA;
           }
+          @media (min-width: 990px) {
+            .card-text {
+              max-height: 100px; 
+              overflow-y: hidden;
+            }
+          }
       </style>
   </head>
   <body>
@@ -72,13 +82,13 @@
           </a>
           <span class="tooltip">Reports</span>
         </li> 
-        <li>
+        <!-- <li>
           <a href="messages-student.php">
             <i class="bx bx-chat"></i>
             <span class="link_name">Messages</span>
           </a>
           <span class="tooltip">Messages</span>
-        </li>
+        </li> -->
         <li>
           <a href="logout.php">
             <i class="bx bx-log-out"></i>
@@ -94,31 +104,46 @@
         <h1 class="text fs-1 fw-bold pt-4">REPORTS</h1>
         <div class="row">
             <div class='col-md-7'>
-
-
-              <!-- display yung mga reports from the database -->
                 <?php
                 
-                $sql = "SELECT * FROM reports INNER JOIN user ON user.email = reports.email";
+                $sql = "SELECT * FROM reports INNER JOIN user ON user.email = reports.email ORDER BY dateReported DESC";
                 $result = $connect->query($sql);
+
+                function getInitials($name) {
+                    $words = explode(" ", $name);
+                    $initials = "";
+                    foreach ($words as $w) {
+                        $initials .= $w[0];
+                    }
+                    return $initials;
+                }
 
                 if ($result->num_rows > 0) {
                     while ($row = $result->fetch_assoc()) {
                         echo "<div class='card mb-3'>";
                         echo "<div class='row g-0'>";
+                        if (!empty($row["picture_path"])) {
                         echo "<div class='col-md-4'>";
                         echo "<img src='" . $row["picture_path"] . "' alt='Report Image' class='img-fluid rounded-start'>";
                         echo "</div>";
                         echo "<div class='col-md-8'>";
-                        echo "<div class='card-body'>";
-                        echo "<h5 class='card-title'>".$row['username']." <small class='text-muted'>" . $row['dateReported'] . "</small></h5>";
-                        echo "<p class='card-text'>" . $row['description'] . "</p>";
+                    } else {
+                        echo "<div class='col'>";
+                    }
+                        
+                        echo "<div class='card-body p-4'>";
+                        echo "<div class='avatar rounded-circle text-center text-white' style='background: #4F9EFA; float: left; width: 35px; height: 35px; line-height: 35px; font-size: 14px;'>"; 
+                        echo getInitials($row['firstname'] . " " . $row['lastname']);
+                        echo "</div>";
+                        echo "<h5 class='card-title ms-5 mt-1' style='margin-left: 10px;'>" . $row['username'] . " <small class='text-muted' style='font-size: 13px'>" . $row['dateReported'] . "</small></h5>";
+                        echo "<p class='card-text p-1'>" . $row['description'] . "</p>";
                         echo "<button class='comment'>";
                         echo "<i class='bx bx-comment-detail'></i>";
-                        echo "<a href='#'>Add A Comment</a>";
+                        echo "<a href='add-comment.php?reportID=" . $row['reportID'] . "'> Add A Comment</a>";
                         echo "</button>";
                         echo "</div>";
                         echo "</div>";
+                
                         echo "</div>";
                         echo "</div>";
                     }
@@ -130,29 +155,33 @@
 
             <div class="col-md-5 sticky-column d-md-block d-none">
                 <div class="card">
-                    <ul>
-                        <h2>My Reports</h2>
+                        <h2 class="fs-3 ps-3 pt-2 text-uppercase">My Reports</h2>
                         <?php
                         $email = $_SESSION['email'];
                 
-                        $sql = "SELECT * FROM reports WHERE email = '$email'";
+                        $sql = "SELECT * FROM reports WHERE email = '$email' ORDER BY dateReported DESC";
 
                 $result = $connect->query($sql);
 
                 if ($result->num_rows > 0) {
                     while ($row = $result->fetch_assoc()) {
-                        echo "<div class='card mb-3'>";
+                        echo "<div class='card mb-3 mx-3'>";
                         echo "<div class='row g-0'>";
-                        echo "<div class='col-md-4'>";
-                        echo "<img src='" . $row["picture_path"] . "' alt='Report Image' class='img-fluid rounded-start'>";
-                        echo "</div>";
-                        echo "<div class='col-md-8'>";
+                        if (!empty($row["picture_path"])) {
+                            echo "<div class='col-md-4'>";
+                            echo "<img src='" . $row["picture_path"] . "' alt='Report Image' class='img-fluid rounded-start'>";
+                            echo "</div>";
+                            echo "<div class='col-md-8'>";
+                        } else {
+                            echo "<div class='col'>";
+                        }
+                        
                         echo "<div class='card-body'>";
-                        echo "<h5 class='card-title'>".$row['email']." <small class='text-muted'>" . $row['dateReported'] . "</small></h5>";
+                        echo "<h5 class='card-title'>"." <small class='text-muted fs-6'>" . $row['dateReported'] . "</small></h5>";
                         echo "<p class='card-text'>" . $row['description'] . "</p>";
                         echo "<button class='comment'>";
-                        echo "<i class='bx bx-comment-detail'></i>";
-                        echo "<a href='#'>Add A Comment</a>";
+                        echo "<i class='bx bx-left-top-arrow-circle'></i>";
+                        echo "<a href='add-comment.php?reportID=" . $row['reportID'] . "'> View Report</a>";
                         echo "</button>";
                         echo "</div>";
                         echo "</div>";
@@ -160,11 +189,10 @@
                         echo "</div>";
                     }
                 } else {
-                    echo "<p>No reports available.</p>";
+                    echo "<p class='ps-3'>No reports available.</p>";
                 }
                 $connect->close();
                 ?>
-                    </ul>
                 </div>
             </div>
         </div>
@@ -179,6 +207,24 @@
 
     
     <script>
+        function displayReports() {
+            $.ajax({
+                url: 'fetch-reports.php', // Endpoint to fetch reports from the database
+                type: 'GET',
+                success: function (data) {
+                    $('.col-md-7').html(data); // Update the Reports section
+                },
+            });
+        }
+        function displayMyReports() {
+            $.ajax({
+                url: 'fetch-myreports.php', // Endpoint to fetch reports from the database
+                type: 'GET',
+                success: function (data) {
+                    $('.col-md-5').html(data); // Update the Reports section
+                },
+            });
+        }
           $(document).ready(function () {
               $('.btn-blue').click(function () {
                   (async () => {
@@ -190,6 +236,7 @@
                                   
                                   <label for="violenceType" class="fw-bold">Type of Violence:</label>
                                   <select class='form-control' id="violenceType" name="violenceType" class="swal2-input" required>
+                                      <option value=""></option>
                                       <option value="Physical Violence">Physical Violence</option>
                                       <option value="Sexual Violence">Sexual Violence</option>
                                       <option value="Emotional Violence">Emotional Violence</option>
@@ -197,9 +244,10 @@
                                       <option value="Spiritual Violence">Spiritual Violence</option>
                                       <option value="Verbal Abuse">Verbal Abuse</option>
                                       <option value="Financial Abuse">Financial Abuse</option>
+                                      <option value="">Others</option>
                                   </select>
-                                  <label for="violence" class="fw-bold mt-2">Violence:</label>
-                                  <input class="form-control" type="text" id="violence" required>
+                                  <label for="violence" class="fw-bold mt-2">If others please specify:</label>
+                                  <input class="form-control" type="text" id="violence">
                                   <label for="location" class="fw-bold mt-2">Location:</label>
                                   <div class="form-check">
                                       <input class="form-check-input" type="radio" name="location" value="Inside Campus" checked>
@@ -224,10 +272,10 @@
                           confirmButtonText: "Submit",
                           focusConfirm: false,
                           preConfirm: () => {
+                            const description = $('#description').val();
                             const violence = $('#violence').val();
-                        const description = $('#description').val();
 
-                        if (!violence || !description) {
+                        if (!description) {
                             Swal.showValidationMessage('Please fill out all required fields.');
                             return false;
                         }
@@ -251,8 +299,13 @@
                                 if (response.success) {
                                     Swal.fire({
                                         icon: 'success',
-                                        title: response.message,
+                                        title: 'Report submitted successfully!',
                                         confirmButtonColor: "#4F9EFA",
+                                    }).then((result) => {
+                                        if (result.isConfirmed) {
+                                            displayReports(); 
+                                            displayMyReports(); 
+                                        }   
                                     });
                                 } else {
                                     Swal.fire({
@@ -274,6 +327,7 @@
                         return true;
                           }
                       });
+                      
                   })();
               });
           });
